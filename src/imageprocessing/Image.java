@@ -76,6 +76,7 @@ public class Image extends javax.swing.JFrame {
         jButton4 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
+        jButton7 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -150,6 +151,13 @@ public class Image extends javax.swing.JFrame {
             }
         });
 
+        jButton7.setText("jButton7");
+        jButton7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton7ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -169,7 +177,10 @@ public class Image extends javax.swing.JFrame {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jButton3)
-                            .addComponent(jButton5))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jButton5)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton7)))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -188,7 +199,9 @@ public class Image extends javax.swing.JFrame {
                     .addComponent(jButton4)
                     .addComponent(jButton6))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton5)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton5)
+                    .addComponent(jButton7))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
                 .addComponent(jButton3))
         );
@@ -384,7 +397,8 @@ public class Image extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     void save4bytePixel() {
-        byte[] byteArray = new byte[(imageHeight * imageWidth * 4) + 8];
+//        byte[] byteArray = new byte[(imageHeight * imageWidth * 4) + 8];
+        byte[] byteArray = new byte[(imageHeight * imageWidth * 3) + 8];
         byte[] width = ByteBuffer.allocate(4).putInt(imageWidth).array();
         byte[] height = ByteBuffer.allocate(4).putInt(imageHeight).array();
 
@@ -397,11 +411,10 @@ public class Image extends javax.swing.JFrame {
         for (int i = 0; i < imageHeight; i++) {
             for (int j = 0; j < imageWidth; j++) {
                 Color color = new Color(image.getRGB(j, i));
-                byteArray[p] = (byte) (color.getAlpha() - 128);
-                byteArray[p + 1] = (byte) (color.getRed() - 128);
-                byteArray[p + 2] = (byte) (color.getGreen() - 128);
-                byteArray[p + 3] = (byte) (color.getBlue() - 128);
-                p = p + 4;
+                byteArray[p] = (byte) (color.getRed() - 128);
+                byteArray[p + 1] = (byte) (color.getGreen() - 128);
+                byteArray[p + 2] = (byte) (color.getBlue() - 128);
+                p = p + 3;
             }
         }
 
@@ -421,11 +434,11 @@ public class Image extends javax.swing.JFrame {
             int width = ByteBuffer.wrap(Arrays.copyOfRange(byteArray, 0, 4)).getInt();
             int height = ByteBuffer.wrap(Arrays.copyOfRange(byteArray, 4, 8)).getInt();
             BufferedImage anImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-            int p = 0;
+            int p = 8;
             for (int i = 0; i < height; i++) {
                 for (int j = 0; j < width; j++) {
-                    anImage.setRGB(j, i, new Color(byteArray[p + 1] + 128, byteArray[p + 2] + 128, byteArray[p + 3] + 128, byteArray[p] + 128).getRGB());
-                    p = p + 4;
+                    anImage.setRGB(j, i, new Color(byteArray[p] + 128, byteArray[p + 1] + 128, byteArray[p + 2] + 128, 255).getRGB());
+                    p = p + 3;
                 }
             }
             image = anImage;
@@ -437,7 +450,7 @@ public class Image extends javax.swing.JFrame {
     }
 
     void save1bytePixel() {
-        byte[] byteArray = new byte[(imageHeight * imageWidth * 4) + 8];
+        byte[] byteArray = new byte[(imageHeight * imageWidth) + 8];
         byte[] width = ByteBuffer.allocate(4).putInt(imageWidth).array();
         byte[] height = ByteBuffer.allocate(4).putInt(imageHeight).array();
 
@@ -450,11 +463,8 @@ public class Image extends javax.swing.JFrame {
         for (int i = 0; i < imageHeight; i++) {
             for (int j = 0; j < imageWidth; j++) {
                 Color color = new Color(image.getRGB(j, i));
-                byteArray[p] = (byte) (color.getAlpha() - 128);
-                byteArray[p + 1] = (byte) (color.getRed() - 128);
-                byteArray[p + 2] = (byte) (color.getGreen() - 128);
-                byteArray[p + 3] = (byte) (color.getBlue() - 128);
-                p = p + 4;
+                byteArray[p] = (byte) (color.getRed() - 128);
+                p++;
             }
         }
 
@@ -468,17 +478,18 @@ public class Image extends javax.swing.JFrame {
 
     }
 
-    void open4sdfsadfdafbytePixel() {
+    void open1bytePixel() {
         try {
             byte[] byteArray = Files.readAllBytes(Paths.get("C:\\Users\\Chanaka\\Desktop\\xx.txt"));
             int width = ByteBuffer.wrap(Arrays.copyOfRange(byteArray, 0, 4)).getInt();
             int height = ByteBuffer.wrap(Arrays.copyOfRange(byteArray, 4, 8)).getInt();
             BufferedImage anImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-            int p = 0;
+            int p = 8;
             for (int i = 0; i < height; i++) {
                 for (int j = 0; j < width; j++) {
-                    anImage.setRGB(j, i, new Color(byteArray[p + 1] + 128, byteArray[p + 2] + 128, byteArray[p + 3] + 128, byteArray[p] + 128).getRGB());
-                    p = p + 4;
+                    int colour = byteArray[p] + 128;
+                    anImage.setRGB(j, i, new Color(colour, colour, colour, 255).getRGB());
+                    p++;
                 }
             }
             image = anImage;
@@ -499,8 +510,12 @@ public class Image extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-//save1bytePixel();
+        save1bytePixel();
     }//GEN-LAST:event_jButton6ActionPerformed
+
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+        open1bytePixel();
+    }//GEN-LAST:event_jButton7ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -544,6 +559,7 @@ public class Image extends javax.swing.JFrame {
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
+    private javax.swing.JButton jButton7;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
