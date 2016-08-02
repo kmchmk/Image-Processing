@@ -77,6 +77,9 @@ public class Image extends javax.swing.JFrame {
         jButton5 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
         jButton7 = new javax.swing.JButton();
+        jButton8 = new javax.swing.JButton();
+        jTextField1 = new javax.swing.JTextField();
+        jTextField2 = new javax.swing.JTextField();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -144,19 +147,30 @@ public class Image extends javax.swing.JFrame {
             }
         });
 
-        jButton6.setText("jButton6");
+        jButton6.setText("Save (B&W)");
         jButton6.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton6ActionPerformed(evt);
             }
         });
 
-        jButton7.setText("jButton7");
+        jButton7.setText("Open (B&W)");
         jButton7.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton7ActionPerformed(evt);
             }
         });
+
+        jButton8.setText("Bilinear");
+        jButton8.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton8ActionPerformed(evt);
+            }
+        });
+
+        jTextField1.setText("100");
+
+        jTextField2.setText("100");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -180,7 +194,13 @@ public class Image extends javax.swing.JFrame {
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(jButton5)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton7)))
+                                .addComponent(jButton7))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jButton8)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -194,7 +214,7 @@ public class Image extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3))
-                .addGap(48, 48, 48)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton4)
                     .addComponent(jButton6))
@@ -202,7 +222,12 @@ public class Image extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton5)
                     .addComponent(jButton7))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton8)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
                 .addComponent(jButton3))
         );
 
@@ -500,6 +525,87 @@ public class Image extends javax.swing.JFrame {
         }
     }
 
+    public void resizeBilinear(int w2, int h2) {
+        //int[] temp = new int[w2 * h2];
+        tempImage = new BufferedImage(w2, h2, BufferedImage.TYPE_INT_RGB);
+
+        int a, b, c, d, x, y, index;
+        Color leftDown, leftUp, rightDown, rightUp;
+        float x_ratio = ((float) (imageWidth - 1)) / w2;
+        float y_ratio = ((float) (imageHeight - 1)) / h2;
+        float x_diff, y_diff, blue, red, green;
+        int offset = 0;
+        for (int i = 0; i < h2; i++) {
+            for (int j = 0; j < w2; j++) {
+                x = (int) (x_ratio * j);
+                y = (int) (y_ratio * i);
+                x_diff = (x_ratio * j) - x;
+                y_diff = (y_ratio * i) - y;
+                index = (y * imageWidth + x);
+
+//                //
+//                leftDown = new Color(image.getRGB(x, y));
+//                rightDown = new Color(image.getRGB(x + 1, y));
+//                leftUp = new Color(image.getRGB(x, y + 1));
+//                rightUp = new Color(image.getRGB(x + 1, y + 1));
+                leftUp = new Color(image.getRGB(x, y));
+                rightUp = new Color(image.getRGB(x + 1, y));
+                leftDown = new Color(image.getRGB(x, y + 1));
+                rightDown = new Color(image.getRGB(x + 1, y + 1));
+
+//                a = pixels[index];
+//                b = pixels[index + 1];
+//                c = pixels[index + imageWidth];
+//                d = pixels[index + imageWidth + 1];
+                // blue element
+                // Yb = Ab(1-w)(1-h) + Bb(w)(1-h) + Cb(h)(1-w) + Db(wh)
+                blue = leftUp.getBlue() * (1 - x_diff) * (1 - y_diff)
+                        + rightUp.getBlue() * x_diff * (1 - y_diff)
+                        + leftDown.getBlue() * (1 - x_diff) * y_diff
+                        + rightDown.getBlue() * x_diff * y_diff;
+
+//                blue = (a & 0xff) * (1 - x_diff) * (1 - y_diff) + (b & 0xff) * (x_diff) * (1 - y_diff)
+//                        + (c & 0xff) * (y_diff) * (1 - x_diff) + (d & 0xff) * (x_diff * y_diff);
+//                System.out.println("blue");
+//                System.out.println(blue);
+//                // green element
+//                // Yg = Ag(1-w)(1-h) + Bg(w)(1-h) + Cg(h)(1-w) + Dg(wh)
+//                green = ((a >> 8) & 0xff) * (1 - x_diff) * (1 - y_diff) + ((b >> 8) & 0xff) * (x_diff) * (1 - y_diff)
+//                        + ((c >> 8) & 0xff) * (y_diff) * (1 - x_diff) + ((d >> 8) & 0xff) * (x_diff * y_diff);
+green = leftUp.getGreen() * (1 - x_diff) * (1 - y_diff)
+                        + rightUp.getGreen() * x_diff * (1 - y_diff)
+                        + leftDown.getGreen() * (1 - x_diff) * y_diff
+                        + rightDown.getGreen() * x_diff * y_diff;
+//                System.out.println("green");
+//                System.out.println(green);
+//                // red element
+//                // Yr = Ar(1-w)(1-h) + Br(w)(1-h) + Cr(h)(1-w) + Dr(wh)
+//                red = ((a >> 16) & 0xff) * (1 - x_diff) * (1 - y_diff) + ((b >> 16) & 0xff) * (x_diff) * (1 - y_diff)
+//                        + ((c >> 16) & 0xff) * (y_diff) * (1 - x_diff) + ((d >> 16) & 0xff) * (x_diff * y_diff);
+
+red = leftUp.getRed() * (1 - x_diff) * (1 - y_diff)
+                        + rightUp.getRed() * x_diff * (1 - y_diff)
+                        + leftDown.getRed() * (1 - x_diff) * y_diff
+                        + rightDown.getRed() * x_diff * y_diff;
+
+//                System.out.println("red");
+//                System.out.println(red);
+                tempImage.setRGB(j, i, new Color((int) red, (int) green, (int) blue, 255).getRGB());
+//                temp[offset++]
+//                        = 0xff000000
+//                        | // hardcode alpha
+//                        ((((int) red) << 16) & 0xff0000)
+//                        | ((((int) green) << 8) & 0xff00)
+//                        | ((int) blue);
+//            }
+//        }
+//        return temp;
+
+                jLabel2.setSize(w2, h2);
+                jLabel2.setIcon(new ImageIcon(tempImage));
+            }
+        }
+    }
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         save4bytePixel();
@@ -516,6 +622,10 @@ public class Image extends javax.swing.JFrame {
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
         open1bytePixel();
     }//GEN-LAST:event_jButton7ActionPerformed
+
+    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
+        resizeBilinear(Integer.parseInt(jTextField1.getText()), Integer.parseInt(jTextField2.getText()));
+    }//GEN-LAST:event_jButton8ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -560,6 +670,7 @@ public class Image extends javax.swing.JFrame {
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
+    private javax.swing.JButton jButton8;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -572,5 +683,7 @@ public class Image extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSpinner jSpinner1;
+    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextField2;
     // End of variables declaration//GEN-END:variables
 }
