@@ -10,6 +10,7 @@ import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -172,7 +173,7 @@ public class Image extends javax.swing.JFrame {
             }
         });
 
-        jButton5.setText("asdfsdf");
+        jButton5.setText("Calcutate Probabilities");
         jButton5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton5ActionPerformed(evt);
@@ -762,8 +763,119 @@ public class Image extends javax.swing.JFrame {
         calculateAverageDeviation();
     }//GEN-LAST:event_jButton7ActionPerformed
 
+    public int getBit(byte b, int bit) {
+        if ((b & (1 << bit)) != 0) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
 
+        //generate every probabilities for all levels
+        HashMap<Integer, Integer> tempHashMap = new HashMap<Integer, Integer>();
+
+        for (int k = 0; k < 256; k++) {//add 0 to all levels
+            tempHashMap.put(k, 0);
+        }
+
+        for (int i = 0; i < imageHeight; i++) {
+            for (int j = 0; j < imageWidth; j++) {
+                int level = (new Color(image.getRGB(j, i))).getRed();
+                tempHashMap.put(level, tempHashMap.get(level) + 1);
+            }
+        }
+        int[] probabilities = new int[256];
+        int[] graylevels = new int[256];
+        for (int i = 0; i < 256; i++) {
+            int minValue = Integer.MAX_VALUE;
+            int keyForMinValue = 0;
+            for (HashMap.Entry<Integer, Integer> entry : tempHashMap.entrySet()) {
+                int tempValue = entry.getValue();
+                if (tempValue < minValue) {
+                    minValue = tempValue;
+                    keyForMinValue = entry.getKey();
+                }
+            }
+            graylevels[i] = keyForMinValue;
+            probabilities[i] = minValue;
+            tempHashMap.remove(keyForMinValue);
+        }
+
+        //graylevels and probabilities arrays contains all the probabilities sorted by the probability.
+
+
+
+        //just printing the probability...
+        for (int i = 0; i < 256; i++) {
+            System.out.print(probabilities[i]);
+            System.out.print(" - ");
+            System.out.println(graylevels[i]);
+        }
+
+//        Map<Integer, Integer> treeMap = new TreeMap<Integer, Integer>(hashMap);
+//        for (Map.Entry<Integer, Integer> entry : treeMap.entrySet()) {
+//            System.out.println("Key : " + entry.getKey()
+//                    + " Value : " + entry.getValue());
+//        }
+//        System.out.println(imageHeight * imageWidth);
+//        int sum = 0;
+//        for (int k = 0; k < 256; k++) {
+//            sum = sum + hashMap.get(k);
+//        }
+//
+//        System.out.println(sum);
+
+        /*
+        int[][] planes = new int[8][imageHeight * imageWidth];
+        for (int i = 0; i < imageHeight; i++) {
+            for (int j = 0; j < imageWidth; j++) {
+                int index = (i * imageWidth) + j;
+                Color color = new Color(image.getRGB(j, i));
+                for (int k = 0; k < 8; k++) {
+                    planes[k][index] = getBit((byte) (color.getRed() - 128), k);
+                }
+            }
+        }
+        System.out.println("Done");
+        System.out.println(planes[7].length);
+        
+        int pre = 0;
+        int count = 0;
+        
+        for (int i = 0; i < planes[7].length; i++) {
+            if(planes[7][i] == pre){
+                count++;
+            }
+            else{
+                System.out.println(count);
+                count = 0;
+                pre = planes[7][i];
+            }
+        }
+         */
+ /*        int hightimes = 0;
+        int num = 0;
+        for (int k = 0; k < 256; k++) {
+            int n = 0;
+            for (int i = 0; i < imageHeight; i++) {
+                for (int j = 0; j < imageWidth; j++) {
+                    int gray = new Color(image.getRGB(j, i)).getRed();
+
+                    if (gray == k) {
+                        n++;
+                    }
+                }
+            }
+            if (n > hightimes) {
+                num = k;
+                hightimes = n;
+            }
+        }
+        System.out.println(num);
+        System.out.println(((double)hightimes)/(imageHeight*imageWidth));
+         */
     }//GEN-LAST:event_jButton5ActionPerformed
 
     /**
@@ -780,16 +892,24 @@ public class Image extends javax.swing.JFrame {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
+
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Image.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Image.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Image.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Image.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Image.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Image.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Image.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Image.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
