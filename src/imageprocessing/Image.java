@@ -9,6 +9,7 @@ import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -173,7 +174,7 @@ public class Image extends javax.swing.JFrame {
             }
         });
 
-        jButton5.setText("Calcutate Probabilities");
+        jButton5.setText("Huffman");
         jButton5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton5ActionPerformed(evt);
@@ -745,33 +746,7 @@ public class Image extends javax.swing.JFrame {
         }
     }
 
-    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-        save1bytePixel();
-    }//GEN-LAST:event_jButton6ActionPerformed
-
-    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
-        resizeBilinear(imageWidth / 2, imageHeight / 2);
-
-// resizeBilinear(Integer.parseInt(jTextField1.getText()), Integer.parseInt(jTextField2.getText()));
-    }//GEN-LAST:event_jButton8ActionPerformed
-
-    private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
-        scaleUp_2x_UsingNearestNeighborMethod();
-    }//GEN-LAST:event_jButton9ActionPerformed
-
-    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-        calculateAverageDeviation();
-    }//GEN-LAST:event_jButton7ActionPerformed
-
-    public int getBit(byte b, int bit) {
-        if ((b & (1 << bit)) != 0) {
-            return 1;
-        } else {
-            return 0;
-        }
-    }
-
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+    public void calculateProbabilitiesAndSort() {
 
         //generate every probabilities for all levels
         HashMap<Integer, Integer> tempHashMap = new HashMap<Integer, Integer>();
@@ -804,9 +779,6 @@ public class Image extends javax.swing.JFrame {
         }
 
         //graylevels and probabilities arrays contains all the probabilities sorted by the probability.
-
-
-
         //just printing the probability...
         for (int i = 0; i < 256; i++) {
             System.out.print(probabilities[i]);
@@ -814,6 +786,89 @@ public class Image extends javax.swing.JFrame {
             System.out.println(graylevels[i]);
         }
 
+    }
+
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        save1bytePixel();
+    }//GEN-LAST:event_jButton6ActionPerformed
+
+    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
+        resizeBilinear(imageWidth / 2, imageHeight / 2);
+
+// resizeBilinear(Integer.parseInt(jTextField1.getText()), Integer.parseInt(jTextField2.getText()));
+    }//GEN-LAST:event_jButton8ActionPerformed
+
+    private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
+        scaleUp_2x_UsingNearestNeighborMethod();
+    }//GEN-LAST:event_jButton9ActionPerformed
+
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+        calculateAverageDeviation();
+    }//GEN-LAST:event_jButton7ActionPerformed
+
+//    public int getBit(byte b, int bit) {
+//        if ((b & (1 << bit)) != 0) {
+//            return 1;
+//        } else {
+//            return 0;
+//        }
+//    }
+//
+//    
+    int[] graylevel = new int[]{7, 6, 5, 4, 3, 2, 1, 0};
+    int[] probabilities = new int[]{2, 4, 6, 8, 10, 12, 14, 16};
+    ArrayList<HuffmanNode> huf = new ArrayList<>(Arrays.asList(new HuffmanNode(0, null, null), new HuffmanNode(1, null, null), new HuffmanNode(2, null, null), new HuffmanNode(3, null, null), new HuffmanNode(4, null, null)));//set values for them...
+
+    public HuffmanNode constructTree() {
+
+        /*
+        for(untill length(huffman array) becomes 1){
+ 
+            create new Node;
+            add huffmann[0] and huffmann[1] to its child nodes
+            updata its int value = sum of child values
+            delete child nodes from the array.
+            add parent to the array
+            sort HUffmaan array using int value
+         */
+        HuffmanNode root = null;
+        while (huf.size() > 1) {
+            HuffmanNode newNode = new HuffmanNode(huf.get(0).getValue() + huf.get(1).getValue(), huf.get(0), huf.get(1));
+
+            huf.remove(1);
+            for (int i = 1; i < huf.size(); i++) {
+                if (newNode.getValue() < huf.get(i).getValue()) {
+                    huf.set(i - 1, newNode);
+                    break;
+                } else {
+                    huf.set(i - 1, huf.get(i));
+                    huf.set(i, newNode);
+                }
+            }
+            root = newNode;
+        }
+        return root;
+    }
+
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+
+        calculateProbabilitiesAndSort();//this will output the probabilities and graylevels as sorted two arrays.
+        constructTree();//given a HuffmanNoe arrayList, this will create a tree and return the root
+        //then write a function to generate the corresponding bit codes
+       // Now we have to connect above first two.
+        
+        
+        
+        
+
+        HuffmanNode roo = constructTree();
+        System.out.println(roo.getLeft().getValue());
+        System.out.println(roo.getRight().getValue());
+
+//        int[] graylevel = new int[]{7, 6, 5, 4, 3, 2, 1, 0};
+//        int[] probabilities = new int[]{2, 4, 6, 8, 10, 12, 14, 16};
 //        Map<Integer, Integer> treeMap = new TreeMap<Integer, Integer>(hashMap);
 //        for (Map.Entry<Integer, Integer> entry : treeMap.entrySet()) {
 //            System.out.println("Key : " + entry.getKey()
@@ -944,4 +999,50 @@ public class Image extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSpinner jSpinner1;
     // End of variables declaration//GEN-END:variables
+
+    public class HuffmanNode {
+
+        int edge;
+        int value;
+        HuffmanNode left;
+        HuffmanNode right;
+
+        public HuffmanNode(int value, HuffmanNode left, HuffmanNode right) {
+            this.value = value;
+            this.left = left;
+            this.right = right;
+        }
+
+        public int getEdge() {
+            return edge;
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+        public HuffmanNode getLeft() {
+            return left;
+        }
+
+        public HuffmanNode getRight() {
+            return right;
+        }
+
+        public void setEdge(int edge) {
+            this.edge = edge;
+        }
+
+        public void setValue(int value) {
+            this.value = value;
+        }
+
+        public void setLeft(HuffmanNode left) {
+            this.left = left;
+        }
+
+        public void setRight(HuffmanNode right) {
+            this.right = right;
+        }
+    }
 }
