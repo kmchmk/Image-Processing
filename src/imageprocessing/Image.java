@@ -39,6 +39,7 @@ public class Image extends javax.swing.JFrame {
 
     int tempImageHeight = 0;
     int tempImageWidth = 0;
+    HashMap<Integer, String> hashMapWithSymbols;
 
     public Image() {
 
@@ -49,7 +50,7 @@ public class Image extends javax.swing.JFrame {
         filechooser.addChoosableFileFilter(new FileNameExtensionFilter("PNG", "PNG"));
         filechooser.addChoosableFileFilter(new FileNameExtensionFilter("GIF", "GIF"));
         filechooser.addChoosableFileFilter(new FileNameExtensionFilter("tt", "tt"));
-        int p = 8;
+
         //delete below later
         try {
             image = ImageIO.read(new File("C:\\Users\\Chanaka\\Desktop\\fb.jpg"));
@@ -746,7 +747,7 @@ public class Image extends javax.swing.JFrame {
         }
     }
 
-    public void calculateProbabilitiesAndSort() {
+    public void CalculateHuffmannCode() {//this will update the "hashMapWithSymbols" with gray level and symbol
 
         //generate every probabilities for all levels
         HashMap<Integer, Integer> tempHashMap = new HashMap<Integer, Integer>();
@@ -755,14 +756,19 @@ public class Image extends javax.swing.JFrame {
             tempHashMap.put(k, 0);
         }
 
+        //Count the probabilities
         for (int i = 0; i < imageHeight; i++) {
             for (int j = 0; j < imageWidth; j++) {
                 int level = (new Color(image.getRGB(j, i))).getRed();
                 tempHashMap.put(level, tempHashMap.get(level) + 1);
             }
         }
-        int[] probabilities = new int[256];
-        int[] graylevels = new int[256];
+
+        //Sort probabilities and create the sorted "probabilities" and "grayLevels" arrays
+        //int[] probabilities = new int[256];
+        //int[] graylevels = new int[256];
+        //Create the sorted HuffmanNode arrayList
+        ArrayList<HuffmanNode> huffmanNodeArray = new ArrayList<>();
         for (int i = 0; i < 256; i++) {
             int minValue = Integer.MAX_VALUE;
             int keyForMinValue = 0;
@@ -773,21 +779,85 @@ public class Image extends javax.swing.JFrame {
                     keyForMinValue = entry.getKey();
                 }
             }
-            graylevels[i] = keyForMinValue;
-            probabilities[i] = minValue;
+            // graylevels[i] = keyForMinValue;
+            //   probabilities[i] = minValue;
+            huffmanNodeArray.add(new HuffmanNode(minValue, keyForMinValue));
             tempHashMap.remove(keyForMinValue);
         }
 
+        ArrayList<HuffmanNode> asdf = huffmanNodeArray;
+
         //graylevels and probabilities arrays contains all the probabilities sorted by the probability.
-        //just printing the probability...
+        /* //just printing the probability...
         for (int i = 0; i < 256; i++) {
-            System.out.print(probabilities[i]);
+            System.out.print(huffmanNodeArray.get(i).getProbability());
             System.out.print(" - ");
-            System.out.println(graylevels[i]);
+            System.out.println(huffmanNodeArray.get(i).getGrayLevel());
+        }
+         */
+        //  int[] graylevel = new int[]{7, 6, 5, 4, 3, 2, 1, 0};
+        // int[] probabilities = new int[]{2, 4, 6, 8, 10, 12, 14, 16};
+//    ArrayList<HuffmanNode> huf = new ArrayList<>(Arrays.asList(new HuffmanNode(0, null, null), new HuffmanNode(1, null, null), new HuffmanNode(2, null, null), new HuffmanNode(3, null, null), new HuffmanNode(4, null, null)));//set values for them...
+        /*
+        //Pseudo Code
+        for(untill length(huffman array) becomes 1){
+            create new Node;
+            add huffmann[0] and huffmann[1] to its child nodes
+            updata its int value = sum of child values
+            delete child nodes from the array.
+            add parent to the array
+            sort HUffmaan array using int value
+         */
+        HuffmanNode root = null;
+        while (huffmanNodeArray.size() > 1) {
+            HuffmanNode newNode = new HuffmanNode(huffmanNodeArray.get(0).getProbability() + huffmanNodeArray.get(1).getProbability(), huffmanNodeArray.get(0), huffmanNodeArray.get(1));
+            huffmanNodeArray.remove(1);
+            for (int i = 1; i < huffmanNodeArray.size(); i++) {
+                if (newNode.getProbability() < huffmanNodeArray.get(i).getProbability()) {
+                    huffmanNodeArray.set(i - 1, newNode);
+                    break;
+                } else {
+                    huffmanNodeArray.set(i - 1, huffmanNodeArray.get(i));
+                    huffmanNodeArray.set(i, newNode);
+                }
+            }
+            root = newNode;
         }
 
+        hashMapWithSymbols = new HashMap<Integer, String>();
+        GenerateSymbol(root);
+
+        /*
+        //this will print the average number of bits of huffman algorithm.        
+        int su = 0;
+        int co = 0;
+        for (int u = 0; u < asdf.size(); u++) {
+            
+            int pro = asdf.get(u).getProbability();
+            int leng = hashMapWithSymbols.get(asdf.get(u).getGrayLevel()).length();
+            su = su + (pro*leng);
+            co = co + pro;
+        }
+        System.out.println("----------");
+        System.out.println(((float)su)/co);
+        System.out.println("----------");
+         */
     }
 
+    void GenerateSymbol(HuffmanNode node) {
+        //if this is a leave of the tree add its symbol and gray level to the hashmap.
+        if ((node.getLeft() == null) & (node.getRight() == null)) {
+            hashMapWithSymbols.put(node.getGrayLevel(), node.getSymbol());
+        } //else, update the symbol and call the recursively same function.
+        else {
+            HuffmanNode left = node.getLeft();
+            HuffmanNode right = node.getRight();
+            left.setSymbol(node.getSymbol() + "0");
+            right.setSymbol(node.getSymbol() + "1");
+            GenerateSymbol(left);
+            GenerateSymbol(right);
+        }
+    }
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
         save1bytePixel();
@@ -816,57 +886,20 @@ public class Image extends javax.swing.JFrame {
 //    }
 //
 //    
-    int[] graylevel = new int[]{7, 6, 5, 4, 3, 2, 1, 0};
-    int[] probabilities = new int[]{2, 4, 6, 8, 10, 12, 14, 16};
-    ArrayList<HuffmanNode> huf = new ArrayList<>(Arrays.asList(new HuffmanNode(0, null, null), new HuffmanNode(1, null, null), new HuffmanNode(2, null, null), new HuffmanNode(3, null, null), new HuffmanNode(4, null, null)));//set values for them...
-
-    public HuffmanNode constructTree() {
-
-        /*
-        for(untill length(huffman array) becomes 1){
- 
-            create new Node;
-            add huffmann[0] and huffmann[1] to its child nodes
-            updata its int value = sum of child values
-            delete child nodes from the array.
-            add parent to the array
-            sort HUffmaan array using int value
-         */
-        HuffmanNode root = null;
-        while (huf.size() > 1) {
-            HuffmanNode newNode = new HuffmanNode(huf.get(0).getValue() + huf.get(1).getValue(), huf.get(0), huf.get(1));
-
-            huf.remove(1);
-            for (int i = 1; i < huf.size(); i++) {
-                if (newNode.getValue() < huf.get(i).getValue()) {
-                    huf.set(i - 1, newNode);
-                    break;
-                } else {
-                    huf.set(i - 1, huf.get(i));
-                    huf.set(i, newNode);
-                }
-            }
-            root = newNode;
-        }
-        return root;
-    }
-
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        CalculateHuffmannCode();//this updates the "hashMapWithSymbols".
 
-        calculateProbabilitiesAndSort();//this will output the probabilities and graylevels as sorted two arrays.
-        constructTree();//given a HuffmanNoe arrayList, this will create a tree and return the root
-        //then write a function to generate the corresponding bit codes
-       // Now we have to connect above first two.
+        //print the codes
+        System.out.println("Gray level - Symbol");
+        for (HashMap.Entry<Integer, String> entry : hashMapWithSymbols.entrySet()) {
+            System.out.print(entry.getKey());
+            System.out.print(" - ");
+            System.out.println(entry.getValue().length());
+        }
+        System.out.println("Gray level - Symbol");
         
         
-        
-        
-
-        HuffmanNode roo = constructTree();
-        System.out.println(roo.getLeft().getValue());
-        System.out.println(roo.getRight().getValue());
-
 //        int[] graylevel = new int[]{7, 6, 5, 4, 3, 2, 1, 0};
 //        int[] probabilities = new int[]{2, 4, 6, 8, 10, 12, 14, 16};
 //        Map<Integer, Integer> treeMap = new TreeMap<Integer, Integer>(hashMap);
@@ -1003,12 +1036,19 @@ public class Image extends javax.swing.JFrame {
     public class HuffmanNode {
 
         int edge;
-        int value;
+        int probability;
+        int grayLevel;
+        String symbol = "";
         HuffmanNode left;
         HuffmanNode right;
 
-        public HuffmanNode(int value, HuffmanNode left, HuffmanNode right) {
-            this.value = value;
+        public HuffmanNode(int probability, int grayLevel) {
+            this.probability = probability;
+            this.grayLevel = grayLevel;
+        }
+
+        public HuffmanNode(int probability, HuffmanNode left, HuffmanNode right) {
+            this.probability = probability;
             this.left = left;
             this.right = right;
         }
@@ -1017,8 +1057,16 @@ public class Image extends javax.swing.JFrame {
             return edge;
         }
 
-        public int getValue() {
-            return value;
+        public int getProbability() {
+            return probability;
+        }
+
+        public int getGrayLevel() {
+            return grayLevel;
+        }
+
+        public String getSymbol() {
+            return symbol;
         }
 
         public HuffmanNode getLeft() {
@@ -1033,8 +1081,16 @@ public class Image extends javax.swing.JFrame {
             this.edge = edge;
         }
 
-        public void setValue(int value) {
-            this.value = value;
+        public void setProbability(int probability) {
+            this.probability = probability;
+        }
+
+        public void setGrayLevel(int grayLevel) {
+            this.grayLevel = grayLevel;
+        }
+
+        public void setSymbol(String symbol) {
+            this.symbol = symbol;
         }
 
         public void setLeft(HuffmanNode left) {
@@ -1044,5 +1100,6 @@ public class Image extends javax.swing.JFrame {
         public void setRight(HuffmanNode right) {
             this.right = right;
         }
+
     }
 }
