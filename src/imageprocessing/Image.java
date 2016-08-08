@@ -85,6 +85,7 @@ public class Image extends javax.swing.JFrame {
         jButton9 = new javax.swing.JButton();
         jButton7 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
+        jButton10 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -182,6 +183,13 @@ public class Image extends javax.swing.JFrame {
             }
         });
 
+        jButton10.setText("Dehuffman");
+        jButton10.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton10ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -208,6 +216,8 @@ public class Image extends javax.swing.JFrame {
                 .addComponent(jButton9)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton10)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -231,7 +241,8 @@ public class Image extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton9)
-                    .addComponent(jButton5))
+                    .addComponent(jButton5)
+                    .addComponent(jButton10))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jButton3))
         );
@@ -747,7 +758,7 @@ public class Image extends javax.swing.JFrame {
         }
     }
 
-    public void CalculateHuffmannCode() {//this will update the "hashMapWithSymbols" with gray level and symbol
+    public void SaveUsingHuffmanSymbols() {//this will update the "hashMapWithSymbols" with gray level and symbol
 
         //generate every probabilities for all levels
         HashMap<Integer, Integer> tempHashMap = new HashMap<Integer, Integer>();
@@ -842,6 +853,67 @@ public class Image extends javax.swing.JFrame {
         System.out.println(((float)su)/co);
         System.out.println("----------");
          */
+        //calculate the maximum length of symbols
+        int maxLengthOfSymbols = 0;
+        for (int i = 0; i < 256; i++) {
+            if (maxLengthOfSymbols < hashMapWithSymbols.get(i).length()) {
+                maxLengthOfSymbols = hashMapWithSymbols.get(i).length();
+            }
+        }
+
+        int numberOfBytesPerEntry = (maxLengthOfSymbols + 7) / 8;
+
+        byte[] byteArray = new byte[9 + (256 * (numberOfBytesPerEntry + 1))];//more length to come. extend later...
+        byte[] width = ByteBuffer.allocate(4).putInt(imageWidth).array();
+        byte[] height = ByteBuffer.allocate(4).putInt(imageHeight).array();
+
+        for (int i = 0; i < 4; i++) {
+            byteArray[i] = width[i];
+            byteArray[i + 4] = height[i];
+        }
+        byteArray[8] = (byte) (numberOfBytesPerEntry - 128);
+
+        int p = 9;
+
+        for (int i = 0; i < 256; i++) {
+            String symbolString = hashMapWithSymbols.get(i);
+            int numberOfBitsInfrontOfSymbol = 0;
+            for (int j = 0; j < symbolString.length(); j++) {
+                if ("0".equals(symbolString.substring(j, j + 1))) {
+                    numberOfBitsInfrontOfSymbol++;
+                } else {
+                    break;
+                }
+            }
+
+            byteArray[p] = (byte) (numberOfBitsInfrontOfSymbol - 128);
+
+            byte[] tempSymbolBytes = new BigInteger(symbolString, 2).toByteArray();
+            byte[] symbolBytes = new byte[numberOfBytesPerEntry];
+            
+            for (int n = 0; n < numberOfBytesPerEntry; n++) {
+                if (n < numberOfBytesPerEntry - tempSymbolBytes.length) {
+                    symbolBytes[n] = 0;
+                } else {
+                    symbolBytes[n] = tempSymbolBytes[n - numberOfBytesPerEntry + tempSymbolBytes.length];
+                }
+            }
+
+            // byte[] symbolBytes = ByteBuffer.allocate(numberOfBytesPerEntry).putInt(Integer.parseInt(symbolString, 2)).array();
+            for (int j = 0; j < numberOfBytesPerEntry; j++) {
+                byteArray[p + 1 + j] = symbolBytes[j];
+            }
+            p = p + 1 + numberOfBytesPerEntry;
+        }
+
+        try {
+            FileOutputStream fos = new FileOutputStream("C:\\Users\\Chanaka\\Desktop\\xx.txt");
+            fos.write(byteArray);
+            fos.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Image.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
     void GenerateSymbol(HuffmanNode node) {
@@ -888,18 +960,25 @@ public class Image extends javax.swing.JFrame {
 //    
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        CalculateHuffmannCode();//this updates the "hashMapWithSymbols".
+        SaveUsingHuffmanSymbols();//this saves the image using Huffmann coding
 
         //print the codes
         System.out.println("Gray level - Symbol");
         for (HashMap.Entry<Integer, String> entry : hashMapWithSymbols.entrySet()) {
             System.out.print(entry.getKey());
             System.out.print(" - ");
-            System.out.println(entry.getValue().length());
+            System.out.println(entry.getValue());
         }
         System.out.println("Gray level - Symbol");
+
+        /*
+        first 8 bytes will show the length and height of the image
         
-        
+        get the max length of the symbols. decide the number of bytes-1 for an entry.
+        The first byte of the file gives the number of bytes for a one entry of hashMapWithSymbols.
+        for an entry first byte will say the number of zeroes infront of the each symbol. rest will gives the symbol with '0's filled in front
+        after that next will be a bit pattern. convert the bit pattern in to a byte array.thats all.
+         */
 //        int[] graylevel = new int[]{7, 6, 5, 4, 3, 2, 1, 0};
 //        int[] probabilities = new int[]{2, 4, 6, 8, 10, 12, 14, 16};
 //        Map<Integer, Integer> treeMap = new TreeMap<Integer, Integer>(hashMap);
@@ -966,6 +1045,10 @@ public class Image extends javax.swing.JFrame {
          */
     }//GEN-LAST:event_jButton5ActionPerformed
 
+    private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
+        
+    }//GEN-LAST:event_jButton10ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1011,6 +1094,7 @@ public class Image extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton10;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
