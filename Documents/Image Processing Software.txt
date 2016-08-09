@@ -1,2 +1,0 @@
-open an image;
-save image in three different formats(.jpg, .png, .gif)
