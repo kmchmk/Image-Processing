@@ -9,6 +9,7 @@ import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,7 +40,7 @@ public class Image extends javax.swing.JFrame {
 
     int tempImageHeight = 0;
     int tempImageWidth = 0;
-    HashMap<Integer, String> hashMapWithSymbols;
+    HashMap<Integer, String> outputHashMapWithSymbols;
 
     public Image() {
 
@@ -746,14 +747,20 @@ public class Image extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton4ActionPerformed
 
     public void open_tt_files(Path filePath) {
-
         try {
             open4bytePixel(filePath);
+            System.out.println("opening 4 byte format...");
         } catch (ArrayIndexOutOfBoundsException e) {
             try {
                 open1bytePixel(filePath);
-            } catch (Exception er) {
-                System.out.println("Error in opening...");;
+                System.out.println("opening 1 byte format...");
+            } catch (ArrayIndexOutOfBoundsException er) {
+                try {
+                    openHuffmanFormat();
+                    System.out.println("opening Huffman format...");
+                } catch (Exception en) {
+                    System.out.println("Error in opening...");
+                }
             }
         }
     }
@@ -835,7 +842,7 @@ public class Image extends javax.swing.JFrame {
             root = newNode;
         }
 
-        hashMapWithSymbols = new HashMap<Integer, String>();
+        outputHashMapWithSymbols = new HashMap<Integer, String>();
         GenerateSymbol(root);
 
         /*
@@ -853,11 +860,18 @@ public class Image extends javax.swing.JFrame {
         System.out.println(((float)su)/co);
         System.out.println("----------");
          */
+ /*
+        first 8 bytes will show the length and height of the image
+        get the max length of the symbols. decide the number of bytes-1 for an entry.
+        The 9th byte of the file gives the number of bytes for a one entry of hashMapWithSymbols.
+        for an entry first byte will say the number of zeroes infront of the each symbol. rest will gives the symbol with '0's filled in front
+        after that next will be a bit pattern. convert the bit pattern in to a byte array.thats all.
+         */
         //calculate the maximum length of symbols
         int maxLengthOfSymbols = 0;
         for (int i = 0; i < 256; i++) {
-            if (maxLengthOfSymbols < hashMapWithSymbols.get(i).length()) {
-                maxLengthOfSymbols = hashMapWithSymbols.get(i).length();
+            if (maxLengthOfSymbols < outputHashMapWithSymbols.get(i).length()) {
+                maxLengthOfSymbols = outputHashMapWithSymbols.get(i).length();
             }
         }
 
@@ -876,7 +890,7 @@ public class Image extends javax.swing.JFrame {
         int p = 9;
 
         for (int i = 0; i < 256; i++) {
-            String symbolString = hashMapWithSymbols.get(i);
+            String symbolString = outputHashMapWithSymbols.get(i);
             int numberOfBitsInfrontOfSymbol = 0;
             for (int j = 0; j < symbolString.length(); j++) {
                 if ("0".equals(symbolString.substring(j, j + 1))) {
@@ -887,10 +901,8 @@ public class Image extends javax.swing.JFrame {
             }
 
             byteArray[p] = (byte) (numberOfBitsInfrontOfSymbol - 128);
-
             byte[] tempSymbolBytes = new BigInteger(symbolString, 2).toByteArray();
             byte[] symbolBytes = new byte[numberOfBytesPerEntry];
-            
             for (int n = 0; n < numberOfBytesPerEntry; n++) {
                 if (n < numberOfBytesPerEntry - tempSymbolBytes.length) {
                     symbolBytes[n] = 0;
@@ -907,7 +919,7 @@ public class Image extends javax.swing.JFrame {
         }
 
         try {
-            FileOutputStream fos = new FileOutputStream("C:\\Users\\Chanaka\\Desktop\\xx.txt");
+            FileOutputStream fos = new FileOutputStream("C:\\Users\\Chanaka\\Desktop\\xx.tt");
             fos.write(byteArray);
             fos.close();
         } catch (IOException ex) {
@@ -919,7 +931,7 @@ public class Image extends javax.swing.JFrame {
     void GenerateSymbol(HuffmanNode node) {
         //if this is a leave of the tree add its symbol and gray level to the hashmap.
         if ((node.getLeft() == null) & (node.getRight() == null)) {
-            hashMapWithSymbols.put(node.getGrayLevel(), node.getSymbol());
+            outputHashMapWithSymbols.put(node.getGrayLevel(), node.getSymbol());
         } //else, update the symbol and call the recursively same function.
         else {
             HuffmanNode left = node.getLeft();
@@ -930,6 +942,64 @@ public class Image extends javax.swing.JFrame {
             GenerateSymbol(right);
         }
     }
+
+    public void openHuffmanFormat() {
+        try {
+            /* delete this comment or convert
+            first 8 bytes will show the length and height of the image
+            get the max length of the symbols. decide the number of bytes-1 for an entry.
+            The 9th byte of the file gives the number of bytes for a one entry of hashMapWithSymbols.
+            for an entry first byte will say the number of zeroes infront of the each symbol. rest will gives the symbol with '0's filled in front
+            after that next will be a bit pattern. convert the bit pattern in to a byte array.thats all.
+             */
+
+            byte[] byteArray = Files.readAllBytes(Paths.get("C:\\Users\\Chanaka\\Desktop\\xx.tt"));
+            int width = ByteBuffer.wrap(Arrays.copyOfRange(byteArray, 0, 4)).getInt();
+            int height = ByteBuffer.wrap(Arrays.copyOfRange(byteArray, 4, 8)).getInt();
+            int numberOfBytesPerEntry = ((int) byteArray[8]) + 128;
+
+            HashMap<String, Integer> inputSymbolHashMap = new HashMap<>();
+
+            int p = 9;
+            for (int i = 0; i < 256; i++) {
+                int numOfZeroesInfront = ((int) byteArray[p]) + 128;
+
+                //create zeroes
+                String firstZeroes = "";
+                for (int s = 0; s < numOfZeroesInfront; s++) {
+                    firstZeroes = "0" + firstZeroes;
+                }
+
+                //get values
+                int valueOfSecondPart = new BigInteger(Arrays.copyOfRange(byteArray, p+1, p + numberOfBytesPerEntry + 1)).intValue();//ByteBuffer.wrap(Arrays.copyOfRange(byteArray, p, p + numberOfBytesPerEntry)).getInt();
+
+                String secondPart = "";
+                if (valueOfSecondPart != 0) {
+                    secondPart = Integer.toBinaryString(valueOfSecondPart);
+                }
+
+                String symbolKey = firstZeroes + secondPart;
+                inputSymbolHashMap.put(symbolKey, i);
+
+                p = p + numberOfBytesPerEntry + 1;
+
+            }
+
+            //print the codes
+            System.out.println("out Gray level - Symbol");
+            for (HashMap.Entry<String, Integer> entry : inputSymbolHashMap.entrySet()) {
+                System.out.print(entry.getKey());
+                System.out.print(" - ");
+                System.out.println(entry.getValue());
+            }
+            System.out.println(" out Gray level - Symbol");
+
+        } catch (IOException ex) {
+            Logger.getLogger(Image.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
         save1bytePixel();
@@ -964,21 +1034,15 @@ public class Image extends javax.swing.JFrame {
 
         //print the codes
         System.out.println("Gray level - Symbol");
-        for (HashMap.Entry<Integer, String> entry : hashMapWithSymbols.entrySet()) {
+        for (HashMap.Entry<Integer, String> entry : outputHashMapWithSymbols.entrySet()) {
             System.out.print(entry.getKey());
             System.out.print(" - ");
-            System.out.println(entry.getValue());
+            System.out.print(entry.getValue());
+            System.out.print(" - ");
+            System.out.println(new BigInteger(entry.getValue(), 2));
         }
         System.out.println("Gray level - Symbol");
 
-        /*
-        first 8 bytes will show the length and height of the image
-        
-        get the max length of the symbols. decide the number of bytes-1 for an entry.
-        The first byte of the file gives the number of bytes for a one entry of hashMapWithSymbols.
-        for an entry first byte will say the number of zeroes infront of the each symbol. rest will gives the symbol with '0's filled in front
-        after that next will be a bit pattern. convert the bit pattern in to a byte array.thats all.
-         */
 //        int[] graylevel = new int[]{7, 6, 5, 4, 3, 2, 1, 0};
 //        int[] probabilities = new int[]{2, 4, 6, 8, 10, 12, 14, 16};
 //        Map<Integer, Integer> treeMap = new TreeMap<Integer, Integer>(hashMap);
@@ -1046,7 +1110,7 @@ public class Image extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
-        
+        openHuffmanFormat();
     }//GEN-LAST:event_jButton10ActionPerformed
 
     /**
