@@ -386,13 +386,6 @@ public class Image extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    void drawImage() {
-        imageWidth = image.getWidth();
-        imageHeight = image.getHeight();
-        jLabel1.setSize(imageWidth, imageHeight);
-        jLabel1.setIcon(new ImageIcon(image));
-    }
-
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         if (filechooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             try {
@@ -434,6 +427,52 @@ public class Image extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        if (image == null) {
+            System.out.println("Load Image...");
+        } else {
+            convertToGrayUsingConstants();
+        }
+
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        if (tempImage == null) {
+        } else {
+            image = tempImage;
+            drawImage();
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        save4bytePixel();
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        save1bytePixel();
+    }//GEN-LAST:event_jButton6ActionPerformed
+
+    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
+        ScaleDown_halfx_UsingBilinearInterpolation(imageWidth / 2, imageHeight / 2);
+    }//GEN-LAST:event_jButton8ActionPerformed
+
+    private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
+        scaleUp_2x_UsingNearestNeighborMethod();
+    }//GEN-LAST:event_jButton9ActionPerformed
+
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+        calculateDeviations(jTable2);
+    }//GEN-LAST:event_jButton7ActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        SaveUsingHuffmanSymbols();//this saves the image using Huffmann coding
+    }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
+        openHuffmanFormat();
+    }//GEN-LAST:event_jButton10ActionPerformed
+
+    //Task 2 - Convert to gray scale using average method
     public void ConvertToGrayUsingAverage() {//Done
         tempImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
         tempImageWidth = tempImage.getWidth();
@@ -450,15 +489,7 @@ public class Image extends javax.swing.JFrame {
         jLabel2.setIcon(new ImageIcon(tempImage));
     }
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        if (image == null) {
-            System.out.println("Load Image...");
-        } else {
-            convertToGrayUsingConstants();
-        }
-
-    }//GEN-LAST:event_jButton2ActionPerformed
-
+    //Task 2 - Convert to gray scale using Luminance preserving method
     public void convertToGrayUsingConstants() {//Done
         tempImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);//new
         tempImageWidth = tempImage.getWidth();
@@ -475,27 +506,7 @@ public class Image extends javax.swing.JFrame {
         jLabel2.setIcon(new ImageIcon(tempImage));
     }
 
-    public void scaleImage(int scale) {
-        tempImage = new BufferedImage((imageWidth + scale - 1) / scale, (imageHeight + scale - 1) / scale, BufferedImage.TYPE_INT_RGB);//new
-        tempImageWidth = tempImage.getWidth();
-        tempImageHeight = tempImage.getHeight();
-        for (int i = 0; i < imageHeight; i = i + scale) {
-            for (int j = 0; j < imageWidth; j = j + scale) {
-                tempImage.setRGB(j / scale, i / scale, image.getRGB(j, i));
-            }
-        }
-        jLabel2.setSize(tempImageWidth, tempImageHeight);
-        jLabel2.setIcon(new ImageIcon(tempImage));
-    }
-
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        if (tempImage == null) {
-        } else {
-            image = tempImage;
-            drawImage();
-        }
-    }//GEN-LAST:event_jButton3ActionPerformed
-
+    //For saving 24bit format
     void save4bytePixel() {
         byte[] byteArray = new byte[(imageHeight * imageWidth * 3) + 8];
         byte[] width = ByteBuffer.allocate(4).putInt(imageWidth).array();//store width
@@ -530,6 +541,7 @@ public class Image extends javax.swing.JFrame {
         }
     }
 
+    //For opening 24bit format
     void open4bytePixel(Path filePath) {
         try {
             byte[] byteArray = Files.readAllBytes(filePath);//Paths.get(filePath));//"C:\\Users\\Chanaka\\Desktop\\xx.tt"));
@@ -551,6 +563,7 @@ public class Image extends javax.swing.JFrame {
         }
     }
 
+    //Task 2 - for saving 8bit format
     void save1bytePixel() {
         byte[] byteArray = new byte[(imageHeight * imageWidth) + 8];
         byte[] width = ByteBuffer.allocate(4).putInt(imageWidth).array();
@@ -582,6 +595,7 @@ public class Image extends javax.swing.JFrame {
         }
     }
 
+    //Task 2 - for opening 8bit format
     void open1bytePixel(Path filePath) {
         try {
             byte[] byteArray = Files.readAllBytes(filePath);
@@ -604,7 +618,8 @@ public class Image extends javax.swing.JFrame {
         }
     }
 
-    public void resizeBilinear(int w2, int h2) {
+    //Task 3 - Scale down (Bilinear interpolation)
+    public void ScaleDown_halfx_UsingBilinearInterpolation(int w2, int h2) {
         tempImage = new BufferedImage(w2, h2, BufferedImage.TYPE_INT_RGB);
 
         double ratioX = ((double) (imageWidth - 1)) / w2;
@@ -646,6 +661,7 @@ public class Image extends javax.swing.JFrame {
         }
     }
 
+    //Task 3 - Scale up (Nearest Neighbor)
     public void scaleUp_2x_UsingNearestNeighborMethod() {
 
         tempImageHeight = imageHeight * 2;
@@ -662,6 +678,7 @@ public class Image extends javax.swing.JFrame {
         jLabel2.setIcon(new ImageIcon(tempImage));
     }
 
+    //Task 4 - Calculate standard deviation and average deviation
     public void calculateDeviations(JTable table) {
 
         //first calculate the mean
@@ -727,29 +744,7 @@ public class Image extends javax.swing.JFrame {
         table.setValueAt(blueStandardDeviation, 1, 3);
     }
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        save4bytePixel();
-    }//GEN-LAST:event_jButton4ActionPerformed
-
-    public void open_tt_files(Path filePath) {
-        try {
-            open4bytePixel(filePath);
-            System.out.println("opening 4 byte format...");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            try {
-                open1bytePixel(filePath);
-                System.out.println("opening 1 byte format...");
-            } catch (ArrayIndexOutOfBoundsException er) {
-                try {
-                    openHuffmanFormat();
-                    System.out.println("opening Huffman format...");
-                } catch (Exception en) {
-                    System.out.println("Error in opening...");
-                }
-            }
-        }
-    }
-
+    //Task 5 - Huffman coding
     public void SaveUsingHuffmanSymbols() {//this will update the "hashMapWithSymbols" with gray level and symbol
 
         //generate every probabilities for all levels
@@ -917,6 +912,7 @@ public class Image extends javax.swing.JFrame {
         }
     }
 
+    //Task 5 - Huffman coding
     public void openHuffmanFormat() {
         try {
             /* delete this comment or convert
@@ -994,26 +990,7 @@ public class Image extends javax.swing.JFrame {
         }
     }
 
-    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-        save1bytePixel();
-    }//GEN-LAST:event_jButton6ActionPerformed
-
-    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
-        resizeBilinear(imageWidth / 2, imageHeight / 2);
-    }//GEN-LAST:event_jButton8ActionPerformed
-
-    private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
-        scaleUp_2x_UsingNearestNeighborMethod();
-    }//GEN-LAST:event_jButton9ActionPerformed
-
-    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-        calculateDeviations(jTable2);
-    }//GEN-LAST:event_jButton7ActionPerformed
-
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        SaveUsingHuffmanSymbols();//this saves the image using Huffmann coding
-    }//GEN-LAST:event_jButton5ActionPerformed
-
+    //Task 5 - Huffman coding
     void GenerateSymbol(HuffmanNode node) {
         //if this is a leave of the tree add its symbol and gray level to the hashmap.
         if ((node.getLeft() == null) & (node.getRight() == null)) {
@@ -1029,9 +1006,31 @@ public class Image extends javax.swing.JFrame {
         }
     }
 
-    private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
-        openHuffmanFormat();
-    }//GEN-LAST:event_jButton10ActionPerformed
+    public void open_tt_files(Path filePath) {
+        try {
+            open4bytePixel(filePath);
+            System.out.println("opening 4 byte format...");
+        } catch (ArrayIndexOutOfBoundsException e) {
+            try {
+                open1bytePixel(filePath);
+                System.out.println("opening 1 byte format...");
+            } catch (ArrayIndexOutOfBoundsException er) {
+                try {
+                    openHuffmanFormat();
+                    System.out.println("opening Huffman format...");
+                } catch (Exception en) {
+                    System.out.println("Error in opening...");
+                }
+            }
+        }
+    }
+
+    void drawImage() {
+        imageWidth = image.getWidth();
+        imageHeight = image.getHeight();
+        jLabel1.setSize(imageWidth, imageHeight);
+        jLabel1.setIcon(new ImageIcon(image));
+    }
 
     /**
      * @param args the command line arguments
