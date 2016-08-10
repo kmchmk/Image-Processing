@@ -48,17 +48,17 @@ public class Image extends javax.swing.JFrame {
         filechooser.addChoosableFileFilter(new FileNameExtensionFilter("JPG", "JPG", "JPEG"));
         filechooser.addChoosableFileFilter(new FileNameExtensionFilter("PNG", "PNG"));
         filechooser.addChoosableFileFilter(new FileNameExtensionFilter("GIF", "GIF"));
-        filechooser.addChoosableFileFilter(new FileNameExtensionFilter("tt", "tt"));
+        filechooser.addChoosableFileFilter(new FileNameExtensionFilter("130281M", "130281M"));
 
-        //delete below later
+      /*  //delete below later
         try {
             image = ImageIO.read(new File("C:\\Users\\Chanaka\\Desktop\\fb.jpg"));
             drawImage();
             calculateDeviations(jTable1);
         } catch (Exception e) {
             System.out.println("Erroreee");
-        }
-    }//till
+        }//till */
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -202,7 +202,7 @@ public class Image extends javax.swing.JFrame {
             }
         });
 
-        jButton10.setText("Dehuffman");
+        jButton10.setText("Run Length");
         jButton10.setMaximumSize(new java.awt.Dimension(115, 23));
         jButton10.setMinimumSize(new java.awt.Dimension(115, 23));
         jButton10.setPreferredSize(new java.awt.Dimension(115, 23));
@@ -469,7 +469,7 @@ public class Image extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
-        openHuffmanFormat();
+
     }//GEN-LAST:event_jButton10ActionPerformed
 
     //Task 2 - Convert to gray scale using average method
@@ -544,7 +544,7 @@ public class Image extends javax.swing.JFrame {
     //For opening 24bit format
     void open4bytePixel(Path filePath) {
         try {
-            byte[] byteArray = Files.readAllBytes(filePath);//Paths.get(filePath));//"C:\\Users\\Chanaka\\Desktop\\xx.tt"));
+            byte[] byteArray = Files.readAllBytes(filePath);
             int width = ByteBuffer.wrap(Arrays.copyOfRange(byteArray, 0, 4)).getInt();
             int height = ByteBuffer.wrap(Arrays.copyOfRange(byteArray, 4, 8)).getInt();
             BufferedImage anImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -744,8 +744,8 @@ public class Image extends javax.swing.JFrame {
         table.setValueAt(blueStandardDeviation, 1, 3);
     }
 
-    //Task 5 - Huffman coding
-    public void SaveUsingHuffmanSymbols() {//this will update the "hashMapWithSymbols" with gray level and symbol
+    //Task 5 - Huffman coding (save)
+    public void SaveUsingHuffmanSymbols() {
 
         //generate every probabilities for all levels
         HashMap<Integer, Integer> tempHashMap = new HashMap<Integer, Integer>();
@@ -832,13 +832,7 @@ public class Image extends javax.swing.JFrame {
         byte[] bytesOfImage = bitsOfImage.toByteArray();
         //convertion is over
 
-        for (int i = 0; i < bytesOfImage.length; i++) {
-            System.out.println(Integer.toBinaryString(bytesOfImage[i]));
-            //88
-        }
-
         int byteLength = (bitLength + 7) / 8;
-
         /*
         first 8 bytes will show the length and height of the image
         get the max length of the symbols. decide the number of bytes-1 for an entry.
@@ -854,7 +848,7 @@ public class Image extends javax.swing.JFrame {
             }
         }
 
-        int numberOfBytesPerEntry = (maxLengthOfSymbols + 7) / 8;
+        int numberOfBytesPerEntry = (maxLengthOfSymbols + 8) / 8;
 
         //initializing byteArray
         byte[] byteArray = new byte[9 + (256 * (numberOfBytesPerEntry + 1)) + byteLength];
@@ -900,30 +894,25 @@ public class Image extends javax.swing.JFrame {
         //add pixels to the byte array.
         for (int i = 0; i < byteLength; i++) {
             byteArray[9 + (256 * (numberOfBytesPerEntry + 1)) + i] = bytesOfImage[i];
-            System.out.println(bytesOfImage[i]);
         }
 
-        try {
-            FileOutputStream fos = new FileOutputStream("C:\\Users\\Chanaka\\Desktop\\xx.tt");
-            fos.write(byteArray);
-            fos.close();
-        } catch (IOException ex) {
-            Logger.getLogger(Image.class.getName()).log(Level.SEVERE, null, ex);
+        if (filechooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            File newImagePath = new File(filechooser.getSelectedFile().toString() + ".130281M");
+            try {
+                FileOutputStream fos = new FileOutputStream(newImagePath);
+                fos.write(byteArray);
+                fos.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Image.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
+
     }
 
-    //Task 5 - Huffman coding
-    public void openHuffmanFormat() {
+    //Task 5 - Huffman coding (open)
+    public void openHuffmanFormat(Path filePath) {
         try {
-            /* delete this comment or convert
-            first 8 bytes will show the length and height of the image
-            get the max length of the symbols. decide the number of bytes-1 for an entry.
-            The 9th byte of the file gives the number of bytes for a one entry of hashMapWithSymbols.
-            for an entry first byte will say the number of zeroes infront of the each symbol. rest will gives the symbol with '0's filled in front
-            after that next will be a bit pattern. convert the bit pattern in to a byte array.thats all.
-             */
-
-            byte[] byteArray = Files.readAllBytes(Paths.get("C:\\Users\\Chanaka\\Desktop\\xx.tt"));
+            byte[] byteArray = Files.readAllBytes(filePath);
             int width = ByteBuffer.wrap(Arrays.copyOfRange(byteArray, 0, 4)).getInt();
             int height = ByteBuffer.wrap(Arrays.copyOfRange(byteArray, 4, 8)).getInt();
             int numberOfBytesPerEntry = ((int) byteArray[8]) + 128;
@@ -942,7 +931,7 @@ public class Image extends javax.swing.JFrame {
                 }
 
                 //get values
-                int valueOfSecondPart = new BigInteger(Arrays.copyOfRange(byteArray, p + 1, p + numberOfBytesPerEntry + 1)).intValue();//ByteBuffer.wrap(Arrays.copyOfRange(byteArray, p, p + numberOfBytesPerEntry)).getInt();
+                int valueOfSecondPart = new BigInteger(Arrays.copyOfRange(byteArray, p + 1, p + numberOfBytesPerEntry + 1)).intValue();
 
                 String secondPart = "";
                 if (valueOfSecondPart != 0) {
@@ -951,22 +940,18 @@ public class Image extends javax.swing.JFrame {
 
                 String symbolKey = firstZeroes + secondPart;
                 inputSymbolHashMap.put(symbolKey, i);
-
                 p = p + numberOfBytesPerEntry + 1;
-
             }
 
             int tableLength = 9 + (256 * (numberOfBytesPerEntry + 1));
-
-            int[] tempasdf = new int[byteArray.length - tableLength];
+            int[] tempasdf = new int[width * height];
             int indexForTemp = 0;
-
             String tempString = "";
-            int tempLength = tempString.length();
             int whileIndexThroughByteArray = tableLength;
 
             while (whileIndexThroughByteArray < byteArray.length) {
                 boolean found = false;
+                int tempLength = tempString.length();
                 for (int index = 1; index < tempLength; index++) {
                     String keyString = tempString.substring(0, index);
                     if (inputSymbolHashMap.containsKey(keyString)) {
@@ -978,13 +963,20 @@ public class Image extends javax.swing.JFrame {
                     }
                 }
                 if (!found) {
-                    tempString = tempString + String.format("%8s", Integer.toBinaryString(byteArray[whileIndexThroughByteArray] & 0xFF)).replace(' ', '0');
+                    tempString = tempString + new StringBuilder(String.format("%8s", Integer.toBinaryString(byteArray[whileIndexThroughByteArray] & 0xFF)).replace(' ', '0')).reverse().toString();
                     whileIndexThroughByteArray++;
                 }
             }
-            for (int i = 0; i < tempasdf.length; i++) {
-                System.out.println(tempasdf[i]);
+
+            BufferedImage anImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            for (int i = 0; i < height; i++) {
+                for (int j = 0; j < width; j++) {
+                    int colour = tempasdf[(width * i) + j];
+                    anImage.setRGB(j, i, new Color(colour, colour, colour, 255).getRGB());
+                }
             }
+            image = anImage;
+            drawImage();
         } catch (IOException ex) {
             Logger.getLogger(Image.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -1016,7 +1008,7 @@ public class Image extends javax.swing.JFrame {
                 System.out.println("opening 1 byte format...");
             } catch (ArrayIndexOutOfBoundsException er) {
                 try {
-                    openHuffmanFormat();
+                    openHuffmanFormat(filePath);
                     System.out.println("opening Huffman format...");
                 } catch (Exception en) {
                     System.out.println("Error in opening...");
