@@ -9,7 +9,6 @@ import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -49,15 +48,16 @@ public class Image extends javax.swing.JFrame {
         filechooser.addChoosableFileFilter(new FileNameExtensionFilter("PNG", "PNG"));
         filechooser.addChoosableFileFilter(new FileNameExtensionFilter("GIF", "GIF"));
         filechooser.addChoosableFileFilter(new FileNameExtensionFilter("130281M", "130281M"));
+//
+//        //delete below later
+//        try {
+//            image = ImageIO.read(new File("C:\\Users\\Chanaka\\Desktop\\fb.jpg"));
+//            drawImage();
+//            calculateDeviations(jTable1);
+//        } catch (Exception e) {
+//            System.out.println("Erroreee");
+//        }//till */
 
-      /*  //delete below later
-        try {
-            image = ImageIO.read(new File("C:\\Users\\Chanaka\\Desktop\\fb.jpg"));
-            drawImage();
-            calculateDeviations(jTable1);
-        } catch (Exception e) {
-            System.out.println("Erroreee");
-        }//till */
     }
 
     /**
@@ -469,10 +469,10 @@ public class Image extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
-
+        saveUsingRunLengthCoding();
     }//GEN-LAST:event_jButton10ActionPerformed
 
-    //Task 2 - Convert to gray scale using average method
+//Task 2 - Convert to gray scale using average method
     public void ConvertToGrayUsingAverage() {//Done
         tempImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
         tempImageWidth = tempImage.getWidth();
@@ -535,8 +535,10 @@ public class Image extends javax.swing.JFrame {
                 FileOutputStream fos = new FileOutputStream(newImagePath);
                 fos.write(byteArray);
                 fos.close();
+
             } catch (IOException ex) {
-                Logger.getLogger(Image.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Image.class
+                        .getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -559,7 +561,8 @@ public class Image extends javax.swing.JFrame {
             drawImage();
 
         } catch (IOException ex) {
-            Logger.getLogger(Image.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Image.class
+                    .getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -589,8 +592,10 @@ public class Image extends javax.swing.JFrame {
                 FileOutputStream fos = new FileOutputStream(newImagePath);
                 fos.write(byteArray);
                 fos.close();
+
             } catch (IOException ex) {
-                Logger.getLogger(Image.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Image.class
+                        .getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -614,7 +619,8 @@ public class Image extends javax.swing.JFrame {
             drawImage();
 
         } catch (IOException ex) {
-            Logger.getLogger(Image.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Image.class
+                    .getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -902,8 +908,10 @@ public class Image extends javax.swing.JFrame {
                 FileOutputStream fos = new FileOutputStream(newImagePath);
                 fos.write(byteArray);
                 fos.close();
+
             } catch (IOException ex) {
-                Logger.getLogger(Image.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Image.class
+                        .getName()).log(Level.SEVERE, null, ex);
             }
         }
 
@@ -944,7 +952,7 @@ public class Image extends javax.swing.JFrame {
             }
 
             int tableLength = 9 + (256 * (numberOfBytesPerEntry + 1));
-            int[] tempasdf = new int[width * height];
+            int[] imageByteArray = new int[width * height];
             int indexForTemp = 0;
             String tempString = "";
             int whileIndexThroughByteArray = tableLength;
@@ -955,7 +963,7 @@ public class Image extends javax.swing.JFrame {
                 for (int index = 1; index < tempLength; index++) {
                     String keyString = tempString.substring(0, index);
                     if (inputSymbolHashMap.containsKey(keyString)) {
-                        tempasdf[indexForTemp] = inputSymbolHashMap.get(keyString);
+                        imageByteArray[indexForTemp] = inputSymbolHashMap.get(keyString);
                         indexForTemp++;
                         tempString = tempString.substring(index);
                         found = true;
@@ -971,14 +979,16 @@ public class Image extends javax.swing.JFrame {
             BufferedImage anImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
             for (int i = 0; i < height; i++) {
                 for (int j = 0; j < width; j++) {
-                    int colour = tempasdf[(width * i) + j];
+                    int colour = imageByteArray[(width * i) + j];
                     anImage.setRGB(j, i, new Color(colour, colour, colour, 255).getRGB());
                 }
             }
             image = anImage;
             drawImage();
+
         } catch (IOException ex) {
-            Logger.getLogger(Image.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Image.class
+                    .getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -995,6 +1005,147 @@ public class Image extends javax.swing.JFrame {
             right.setSymbol(node.getSymbol() + "1");
             GenerateSymbol(left);
             GenerateSymbol(right);
+        }
+    }
+
+    //Task 5 - Run length coding (save)
+    void saveUsingRunLengthCoding() {
+        int imageSize = imageHeight * imageWidth;
+        int numberOfBitsConsiderd = 8;//This can be changed later if needed.
+        //create the inverted image
+        boolean[][] invertedImage = new boolean[numberOfBitsConsiderd][imageSize];
+        for (int i = 0; i < imageHeight; i++) {
+            for (int j = 0; j < imageWidth; j++) {
+                int color = new Color(image.getRGB(j, i)).getRed();
+                for (int k = 0; k < numberOfBitsConsiderd; k++) {
+                    int power = (int) Math.pow(2, 7 - k);
+                    if (color < power) {
+                        invertedImage[k][(i * imageWidth) + j] = false;
+                    } else {
+                        invertedImage[k][(i * imageWidth) + j] = true;
+                        color = (int) (color - power);
+                    }
+                }
+            }
+        }
+
+        //get the first bit
+        byte[] firstbit = new byte[numberOfBitsConsiderd];
+        for (int i = 0; i < numberOfBitsConsiderd; i++) {
+            if (invertedImage[i][0]) {
+                firstbit[i] = 1;
+            } else {
+                firstbit[i] = 0;
+            }
+
+        }
+
+        //calculate bit counts for each bit position - run lengths
+        ArrayList<ArrayList<Integer>> imageArray = new ArrayList<>();
+        for (int g = 0; g < numberOfBitsConsiderd; g++) {
+            imageArray.add(new ArrayList<Integer>());
+            int i = 0;
+            while (i < imageSize) {
+                boolean tf = invertedImage[g][i];
+                int count = 0;
+                while (i < imageSize && invertedImage[g][i] == tf) {
+                    count++;
+                    i++;
+                }
+                imageArray.get(g).add(count);
+            }
+        }
+
+        //calculate the number of entries
+        int[] numberOfEntries = new int[numberOfBitsConsiderd];
+        for (int i = 0; i < numberOfBitsConsiderd; i++) {
+            numberOfEntries[i] = imageArray.get(i).size();
+        }
+
+        //calculate maximum bit count to decide the number of bytes per entry
+        int[] max = new int[numberOfBitsConsiderd];
+        for (int i = 0; i < numberOfBitsConsiderd; i++) {
+            max[i] = 0;//first add 0 to them
+            int lengthArray = imageArray.get(i).size();
+            for (int j = 0; j < lengthArray; j++) {
+                int tempVal = imageArray.get(i).get(j);
+                if (tempVal > max[i]) {
+                    max[i] = tempVal;
+                }
+            }
+        }
+
+        //calclate number of bytes per entry
+        int[] numberOfBytesPerEntry = new int[numberOfBitsConsiderd];
+        for (int i = 0; i < numberOfBitsConsiderd; i++) {
+            numberOfBytesPerEntry[i] = 0;//set them all zero
+            while (Math.pow(2, (8 * numberOfBytesPerEntry[i])) < max[i]) {
+                numberOfBytesPerEntry[i] = numberOfBytesPerEntry[i] + 1;
+            }
+        }
+
+        //calculate the total number of entries
+        int totalNumberOfBytesForData = 0;
+        for (int i = 0; i < numberOfBitsConsiderd; i++) {
+            totalNumberOfBytesForData = totalNumberOfBytesForData + numberOfBytesPerEntry[i] * numberOfEntries[i];
+        }
+
+        //data - width, height, number of bytes per entry, first bit, number of entries,  data 
+        byte[] byteArray = new byte[9 + 6 * numberOfBitsConsiderd + totalNumberOfBytesForData];
+        byte[] width = ByteBuffer.allocate(4).putInt(imageWidth).array();//get width
+        byte[] height = ByteBuffer.allocate(4).putInt(imageHeight).array();//get height
+
+        //Store width and height
+        for (int i = 0; i < 4; i++) {
+            byteArray[i] = width[i];
+            byteArray[i + 4] = height[i];
+        }
+
+        //add number of bits considered
+        byteArray[8] = (byte) numberOfBitsConsiderd;
+
+        //store the number of bytes per entry and the first bits
+        int p = 9;
+        for (int i = 0; i < numberOfBitsConsiderd; i++) {
+            byteArray[p] = (byte) numberOfBytesPerEntry[i];
+            byteArray[p + numberOfBitsConsiderd] = firstbit[i];
+            p++;
+        }
+        p = 9 + (2 * numberOfBitsConsiderd); //set the pointer to last location
+
+        //store the number of entries
+        for (int i = 0; i < numberOfBitsConsiderd; i++) {
+            byte[] tempCountOfEntries = ByteBuffer.allocate(4).putInt(numberOfEntries[i]).array();
+            for (int j = 0; j < 4; j++) {
+                byteArray[p] = tempCountOfEntries[j];
+                p++;
+            }
+        }
+
+        //add data to the byte Array
+        for (int i = 0; i < numberOfBitsConsiderd; i++) {
+            for (int j = 0; j < numberOfEntries[i]; j++) {
+                int current = imageArray.get(i).get(j);
+                byte[] tempValue = ByteBuffer.allocate(4).putInt(current).array();
+                for (int k = 0; k < numberOfBytesPerEntry[i]; k++) {
+                    byteArray[p] = tempValue[k + 4 - numberOfBytesPerEntry[i]];
+                    p++;
+                }
+            }
+        }
+
+        //save the file
+        if (filechooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            File newImagePath = new File(filechooser.getSelectedFile().toString() + ".130281M");
+            try {
+                FileOutputStream fos = new FileOutputStream(newImagePath);
+                fos.write(byteArray);
+                fos.close();
+
+            } catch (IOException ex) {
+                Logger.getLogger(Image.class
+                        .getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
