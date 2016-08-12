@@ -95,7 +95,6 @@ public class Image extends javax.swing.JFrame {
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
-        jMenu2 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -109,11 +108,13 @@ public class Image extends javax.swing.JFrame {
         jScrollPane1.setMinimumSize(new java.awt.Dimension(0, 0));
 
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setToolTipText("Press Ctrl+O to open an image");
         jScrollPane1.setViewportView(jLabel1);
 
         jScrollPane2.setMinimumSize(new java.awt.Dimension(0, 0));
 
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel2.setToolTipText("Press Ctrl+S to save an image");
         jScrollPane2.setViewportView(jLabel2);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -369,9 +370,6 @@ public class Image extends javax.swing.JFrame {
         jMenu1.add(jMenuItem2);
 
         jMenuBar1.add(jMenu1);
-
-        jMenu2.setText("Edit");
-        jMenuBar1.add(jMenu2);
 
         setJMenuBar(jMenuBar1);
 
@@ -1215,7 +1213,6 @@ public class Image extends javax.swing.JFrame {
     }
 
     public void open_130281M_files(Path filePath) {
-
         String extention = filePath.toString().split("\\.(?=[^\\.]+$)")[1];
 
         if ("8bit".equals(extention)) {
@@ -1328,7 +1325,6 @@ public class Image extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
