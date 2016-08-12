@@ -9,6 +9,7 @@ import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -90,6 +91,8 @@ public class Image extends javax.swing.JFrame {
         jTable2 = new javax.swing.JTable();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
+        jButton11 = new javax.swing.JButton();
+        jComboBox1 = new javax.swing.JComboBox<>();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -266,26 +269,48 @@ public class Image extends javax.swing.JFrame {
 
         jLabel4.setText("Edited Image");
 
+        jButton11.setText("jButton11");
+        jButton11.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton11ActionPerformed(evt);
+            }
+        });
+
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4", "5", "6", "7", "8" }));
+        jComboBox1.setSelectedIndex(7);
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton7, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jButton5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 255, Short.MAX_VALUE)
+                            .addComponent(jButton5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 272, Short.MAX_VALUE)
                             .addComponent(jButton4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jButton8, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jButton1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE)
+                            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jButton9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jButton10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jButton6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(jButton6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jButton10, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 320, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(48, 48, 48)
+                        .addComponent(jButton11)
+                        .addGap(0, 70, Short.MAX_VALUE)))
                 .addGap(25, 25, 25)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel4)
@@ -321,9 +346,12 @@ public class Image extends javax.swing.JFrame {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jButton5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jButton10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel4))
+                            .addComponent(jLabel4)
+                            .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jButton7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jButton11))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
@@ -469,10 +497,19 @@ public class Image extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
-        saveUsingRunLengthCoding();
+        saveRunLengthCoding();
     }//GEN-LAST:event_jButton10ActionPerformed
 
-//Task 2 - Convert to gray scale using average method
+    private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton11ActionPerformed
+        Path filePath = Paths.get("C:\\Users\\Chanaka\\Desktop\\0.130281M"); //Change this later
+        openRunLengthCoding(filePath);
+    }//GEN-LAST:event_jButton11ActionPerformed
+
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jComboBox1ActionPerformed
+
+    //Task 2 - Convert to gray scale using average method
     public void ConvertToGrayUsingAverage() {//Done
         tempImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
         tempImageWidth = tempImage.getWidth();
@@ -1009,9 +1046,10 @@ public class Image extends javax.swing.JFrame {
     }
 
     //Task 5 - Run length coding (save)
-    void saveUsingRunLengthCoding() {
+    void saveRunLengthCoding() {
         int imageSize = imageHeight * imageWidth;
-        int numberOfBitsConsiderd = 8;//This can be changed later if needed.
+        int numberOfBitsConsiderd = Integer.parseInt(jComboBox1.getSelectedItem().toString());
+
         //create the inverted image
         boolean[][] invertedImage = new boolean[numberOfBitsConsiderd][imageSize];
         for (int i = 0; i < imageHeight; i++) {
@@ -1037,7 +1075,6 @@ public class Image extends javax.swing.JFrame {
             } else {
                 firstbit[i] = 0;
             }
-
         }
 
         //calculate bit counts for each bit position - run lengths
@@ -1121,7 +1158,6 @@ public class Image extends javax.swing.JFrame {
                 p++;
             }
         }
-
         //add data to the byte Array
         for (int i = 0; i < numberOfBitsConsiderd; i++) {
             for (int j = 0; j < numberOfEntries[i]; j++) {
@@ -1149,20 +1185,115 @@ public class Image extends javax.swing.JFrame {
         }
     }
 
+    //Task 5 - Run length coding (open)
+    void openRunLengthCoding(Path filePath) {
+        try {
+            byte[] byteArray = Files.readAllBytes(filePath);
+            int width = ByteBuffer.wrap(Arrays.copyOfRange(byteArray, 0, 4)).getInt();
+            int height = ByteBuffer.wrap(Arrays.copyOfRange(byteArray, 4, 8)).getInt();
+
+            //get number of bits considered
+            int numberOfBitsConsiderd = byteArray[8];
+
+            int[] numberOfBytesPerEntry = new int[numberOfBitsConsiderd];
+            int[] firstbit = new int[numberOfBitsConsiderd];
+
+            int p = 9;//set the pointer to current location
+
+            for (int i = 0; i < numberOfBitsConsiderd; i++) {
+                numberOfBytesPerEntry[i] = byteArray[p];
+                firstbit[i] = byteArray[p + numberOfBitsConsiderd];
+                p++;
+            }
+
+            p = 9 + (2 * numberOfBitsConsiderd); //set the pointer to last location
+
+            //get the number of entries
+            int[] numberOfEntries = new int[numberOfBitsConsiderd];
+            for (int i = 0; i < numberOfBitsConsiderd; i++) {
+                numberOfEntries[i] = new BigInteger(Arrays.copyOfRange(byteArray, p, p + 4)).intValue();
+                p = p + 4;
+            }
+
+            p = 9 + (6 * numberOfBitsConsiderd); //set the pointer to last location
+            ArrayList<ArrayList<Integer>> imageArray = new ArrayList<>();
+
+            //add data to the byte Array
+            for (int i = 0; i < numberOfBitsConsiderd; i++) {
+                imageArray.add(new ArrayList<Integer>());
+                for (int j = 0; j < numberOfEntries[i]; j++) {
+                    imageArray.get(i).add(new BigInteger(Arrays.copyOfRange(byteArray, p, p + numberOfBytesPerEntry[i])).intValue());
+                    p = p + numberOfBytesPerEntry[i];
+                }
+            }
+
+            int sum = 0;
+            for (int i = 0; i < numberOfBitsConsiderd; i++) {
+                for (int j = 0; j < imageArray.get(i).size(); j++) {
+                    sum = sum + imageArray.get(i).get(j);
+                }
+            }
+
+            int imageSize = width * height;
+            boolean[][] invertedImage = new boolean[numberOfBitsConsiderd][imageSize];
+
+            for (int i = 0; i < numberOfBitsConsiderd; i++) {
+                p = 0;
+                boolean tf = false;
+                if (firstbit[i] == 1) {
+                    tf = true;
+                }
+
+                for (int j = 0; j < numberOfEntries[i]; j++) {
+                    for (int k = 0; k < imageArray.get(i).get(j); k++) {
+                        invertedImage[i][p] = tf;
+                        p++;
+                    }
+                    tf = !tf;
+                }
+            }
+
+            //Draw the image
+            BufferedImage anImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+            for (int i = 0; i < height; i++) {
+                for (int j = 0; j < width; j++) {
+                    int colour = 0;
+                    for (int k = 0; k < numberOfBitsConsiderd; k++) {
+                        if (invertedImage[k][(i * width) + j]) {
+                            colour = (int) (colour + Math.pow(2, 7 - k));
+                        }
+                    }
+                    anImage.setRGB(j, i, new Color(colour, colour, colour, 255).getRGB());
+                }
+            }
+            image = anImage;
+            drawImage();
+
+        } catch (IOException ex) {
+            Logger.getLogger(Image.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     public void open_tt_files(Path filePath) {
         try {
             open4bytePixel(filePath);
             System.out.println("opening 4 byte format...");
         } catch (ArrayIndexOutOfBoundsException e) {
             try {
-                open1bytePixel(filePath);
-                System.out.println("opening 1 byte format...");
-            } catch (ArrayIndexOutOfBoundsException er) {
+                openRunLengthCoding(filePath);
+                System.out.println("opening run length format...");
+            } catch (NegativeArraySizeException er) {
                 try {
-                    openHuffmanFormat(filePath);
-                    System.out.println("opening Huffman format...");
-                } catch (Exception en) {
-                    System.out.println("Error in opening...");
+                    open1bytePixel(filePath);
+                    System.out.println("opening 1 byte format...");
+                } catch (ArrayIndexOutOfBoundsException ec) {
+                    try {
+                        openHuffmanFormat(filePath);
+                        System.out.println("opening Huffman format...");
+                    } catch (Exception en) {
+                        System.out.println("Error in opening...");
+                    }
                 }
             }
         }
@@ -1221,6 +1352,7 @@ public class Image extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton10;
+    private javax.swing.JButton jButton11;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
@@ -1229,6 +1361,7 @@ public class Image extends javax.swing.JFrame {
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
+    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
