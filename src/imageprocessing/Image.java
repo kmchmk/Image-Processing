@@ -9,7 +9,6 @@ import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -195,7 +194,7 @@ public class Image extends javax.swing.JFrame {
             }
         });
 
-        jButton5.setText("Huffman");
+        jButton5.setText("Save (Huffman)");
         jButton5.setMaximumSize(new java.awt.Dimension(115, 23));
         jButton5.setMinimumSize(new java.awt.Dimension(115, 23));
         jButton5.setPreferredSize(new java.awt.Dimension(115, 23));
@@ -205,7 +204,7 @@ public class Image extends javax.swing.JFrame {
             }
         });
 
-        jButton10.setText("Run Length");
+        jButton10.setText("Save (Run Length)");
         jButton10.setMaximumSize(new java.awt.Dimension(115, 23));
         jButton10.setMinimumSize(new java.awt.Dimension(115, 23));
         jButton10.setPreferredSize(new java.awt.Dimension(115, 23));
@@ -905,81 +904,6 @@ public class Image extends javax.swing.JFrame {
 
     }
 
-    //Task 5 - Huffman coding (open)
-    public void openHuffmanFormat(Path filePath) {
-        try {
-            byte[] byteArray = Files.readAllBytes(filePath);
-            int width = ByteBuffer.wrap(Arrays.copyOfRange(byteArray, 0, 4)).getInt();
-            int height = ByteBuffer.wrap(Arrays.copyOfRange(byteArray, 4, 8)).getInt();
-            int numberOfBytesPerEntry = ((int) byteArray[8]) + 128;
-
-            //decode the Haffman table
-            HashMap<String, Integer> inputSymbolHashMap = new HashMap<>();
-
-            int p = 9;
-            for (int i = 0; i < 256; i++) {
-                int numOfZeroesInfront = ((int) byteArray[p]) + 128;
-
-                //create zeroes
-                String firstZeroes = "";
-                for (int s = 0; s < numOfZeroesInfront; s++) {
-                    firstZeroes = "0" + firstZeroes;
-                }
-
-                //get values
-                int valueOfSecondPart = new BigInteger(Arrays.copyOfRange(byteArray, p + 1, p + numberOfBytesPerEntry + 1)).intValue();
-
-                String secondPart = "";
-                if (valueOfSecondPart != 0) {
-                    secondPart = Integer.toBinaryString(valueOfSecondPart);
-                }
-
-                String symbolKey = firstZeroes + secondPart;
-                inputSymbolHashMap.put(symbolKey, i);
-                p = p + numberOfBytesPerEntry + 1;
-            }
-
-            int tableLength = 9 + (256 * (numberOfBytesPerEntry + 1));
-            int[] imageByteArray = new int[width * height];
-            int indexForTemp = 0;
-            String tempString = "";
-            int whileIndexThroughByteArray = tableLength;
-
-            while (whileIndexThroughByteArray < byteArray.length) {
-                boolean found = false;
-                int tempLength = tempString.length();
-                for (int index = 1; index < tempLength; index++) {
-                    String keyString = tempString.substring(0, index);
-                    if (inputSymbolHashMap.containsKey(keyString)) {
-                        imageByteArray[indexForTemp] = inputSymbolHashMap.get(keyString);
-                        indexForTemp++;
-                        tempString = tempString.substring(index);
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    tempString = tempString + new StringBuilder(String.format("%8s", Integer.toBinaryString(byteArray[whileIndexThroughByteArray] & 0xFF)).replace(' ', '0')).reverse().toString();
-                    whileIndexThroughByteArray++;
-                }
-            }
-
-            BufferedImage anImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-            for (int i = 0; i < height; i++) {
-                for (int j = 0; j < width; j++) {
-                    int colour = imageByteArray[(width * i) + j];
-                    anImage.setRGB(j, i, new Color(colour, colour, colour, 255).getRGB());
-                }
-            }
-            image = anImage;
-            drawImage();
-
-        } catch (IOException ex) {
-            Logger.getLogger(Image.class
-                    .getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
     //Task 5 - Huffman coding
     void GenerateSymbol(HuffmanNode node) {
         //if this is a leave of the tree add its symbol and gray level to the hashmap.
@@ -1125,7 +1049,82 @@ public class Image extends javax.swing.JFrame {
         save_130281M_files(byteArray, "runlength");
     }
 
-    //Task 5 - Run length coding (open)
+    //Task 6 - Huffman coding (open)
+    public void openHuffmanFormat(Path filePath) {
+        try {
+            byte[] byteArray = Files.readAllBytes(filePath);
+            int width = ByteBuffer.wrap(Arrays.copyOfRange(byteArray, 0, 4)).getInt();
+            int height = ByteBuffer.wrap(Arrays.copyOfRange(byteArray, 4, 8)).getInt();
+            int numberOfBytesPerEntry = ((int) byteArray[8]) + 128;
+
+            //decode the Haffman table
+            HashMap<String, Integer> inputSymbolHashMap = new HashMap<>();
+
+            int p = 9;
+            for (int i = 0; i < 256; i++) {
+                int numOfZeroesInfront = ((int) byteArray[p]) + 128;
+
+                //create zeroes
+                String firstZeroes = "";
+                for (int s = 0; s < numOfZeroesInfront; s++) {
+                    firstZeroes = "0" + firstZeroes;
+                }
+
+                //get values
+                int valueOfSecondPart = new BigInteger(Arrays.copyOfRange(byteArray, p + 1, p + numberOfBytesPerEntry + 1)).intValue();
+
+                String secondPart = "";
+                if (valueOfSecondPart != 0) {
+                    secondPart = Integer.toBinaryString(valueOfSecondPart);
+                }
+
+                String symbolKey = firstZeroes + secondPart;
+                inputSymbolHashMap.put(symbolKey, i);
+                p = p + numberOfBytesPerEntry + 1;
+            }
+
+            int tableLength = 9 + (256 * (numberOfBytesPerEntry + 1));
+            int[] imageByteArray = new int[width * height];
+            int indexForTemp = 0;
+            String tempString = "";
+            int whileIndexThroughByteArray = tableLength;
+
+            while (whileIndexThroughByteArray < byteArray.length) {
+                boolean found = false;
+                int tempLength = tempString.length();
+                for (int index = 1; index < tempLength; index++) {
+                    String keyString = tempString.substring(0, index);
+                    if (inputSymbolHashMap.containsKey(keyString)) {
+                        imageByteArray[indexForTemp] = inputSymbolHashMap.get(keyString);
+                        indexForTemp++;
+                        tempString = tempString.substring(index);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    tempString = tempString + new StringBuilder(String.format("%8s", Integer.toBinaryString(byteArray[whileIndexThroughByteArray] & 0xFF)).replace(' ', '0')).reverse().toString();
+                    whileIndexThroughByteArray++;
+                }
+            }
+
+            BufferedImage anImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            for (int i = 0; i < height; i++) {
+                for (int j = 0; j < width; j++) {
+                    int colour = imageByteArray[(width * i) + j];
+                    anImage.setRGB(j, i, new Color(colour, colour, colour, 255).getRGB());
+                }
+            }
+            image = anImage;
+            drawImage();
+
+        } catch (IOException ex) {
+            Logger.getLogger(Image.class
+                    .getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    //Task 6 - Run length coding (open)
     void openRunLengthCoding(Path filePath) {
         try {
             byte[] byteArray = Files.readAllBytes(filePath);
